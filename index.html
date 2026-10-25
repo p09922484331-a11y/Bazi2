@@ -57,7 +57,7 @@ body.ls #gd{right:calc(186px + env(safe-area-inset-right,0px))}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>if(typeof THREE==="undefined"){document.getElementById("msg").innerHTML="<h1>اینترنت لازم است</h1><small>کتابخانه‌ی سه‌بعدی بارگذاری نشد. اتصال را چک کن و صفحه را دوباره باز کن.</small>"}</script>
 <script>
-const W=300,H=480,L=3,LW=100,PX=.034,LANE=3.4,ZS=.1,T=THREE;
+const W=300,H=480,L=3,LW=100,ZS=.1,T=THREE;let PX=.034,LANE=3.4;
 const cv=document.getElementById('c'),hx=cv.getContext('2d'),msg=document.getElementById('msg');
 const scEl=document.getElementById('sc'),hiEl=document.getElementById('hi'),ps=document.getElementById('ps'),coEl=document.getElementById('co');
 let best=0;try{best=+localStorage.getItem('carbest')||0}catch(e){}
@@ -3103,9 +3103,10 @@ function setPaused(p){
 }
 addEventListener('keydown',e=>{if(e.key==='ArrowLeft')move(-1);if(e.key==='ArrowRight')move(1);if(e.key==='ArrowUp'){e.preventDefault();shift(1)}if(e.key==='ArrowDown'){e.preventDefault();shift(-1)}if(e.key===' '||e.key==='Shift'){e.preventDefault();cl=true}if(e.key==='n'||e.key==='N')nitro=true;if(e.key==='w'||e.key==='W')wh=true;if(e.key==='p'||e.key==='P'||e.key==='Escape')setPaused(!paused)});
 addEventListener('keyup',e=>{if(e.key===' '||e.key==='Shift')cl=false;if(e.key==='w'||e.key==='W')wh=false;if(e.key==='n'||e.key==='N')nitro=false});
-cv.addEventListener('pointerdown',e=>{lastX=e.clientX;cv.setPointerCapture(e.pointerId);pick(e)});
-cv.addEventListener('pointermove',e=>{if(lastX===null)return;pick(e)});
-cv.addEventListener('pointerup',()=>{lastX=null});cv.addEventListener('pointercancel',()=>{lastX=null});
+const LS=()=>document.body.classList.contains('ls');let mvd=false;
+cv.addEventListener('pointerdown',e=>{lastX=e.clientX;mvd=false;cv.setPointerCapture(e.pointerId);if(!LS())pick(e)});
+cv.addEventListener('pointermove',e=>{if(lastX===null)return;if(LS()){const d=e.clientX-lastX;if(Math.abs(d)>38){move(d>0?1:-1);lastX=e.clientX;mvd=true}return}pick(e)});
+cv.addEventListener('pointerup',e=>{if(LS()&&lastX!==null&&!mvd){const r=cv.getBoundingClientRect();move(e.clientX<r.left+r.width/2?-1:1)}lastX=null});cv.addEventListener('pointercancel',()=>{lastX=null});
 document.getElementById('gu').onpointerdown=()=>shift(1);document.getElementById('gd').onpointerdown=()=>shift(-1);
 const clb=document.getElementById('clb');clb.onpointerdown=e=>{e.preventDefault();cl=true;try{clb.setPointerCapture(e.pointerId)}catch(_){}};clb.onpointerup=clb.onpointercancel=()=>{cl=false};
 const whb=document.getElementById('whb');whb.onpointerdown=e=>{e.preventDefault();wh=true;try{whb.setPointerCapture(e.pointerId)}catch(_){}};whb.onpointerup=whb.onpointercancel=()=>{wh=false};
@@ -3182,7 +3183,7 @@ function tick(){
   rt.offset.y+=sp*ZS/8;trees.forEach(t=>{t.position.z+=sp*ZS;if(t.position.z>12){t.position.z-=117;place(t)}});
   enemies.forEach(e=>{e.m.position.set((e.l-1)*LANE,0,-(H-70-e.y)*ZS);if(e.p){e.p.r.visible=fr%20<10;e.p.b.visible=!e.p.r.visible}});
   coins.forEach(c=>{c.m.position.set((c.l-1)*LANE,1.1,-(H-70-c.y)*ZS);c.m.rotation.y+=.08});
-  if(pol.on){if(!pol.k){pol.x+=((lane-1)*LANE-pol.x)*.06;pol.m.g.position.set(pol.x,0,3.4+Math.max(0,pol.g)*.03)}
+  if(pol.on){if(!pol.k){pol.x+=((lane-1)*LANE-pol.x)*.06;pol.m.g.position.set(pol.x,0,3.4+Math.max(0,pol.g)*(LS()?.012:.03))}
     else{pol.m.g.position.set(pol.x,9,-3);pol.m.rot.rotation.y+=.7;pol.m.spot.material.opacity=.25+.3*Math.min(1,pol.lit/110)}
     pol.m.r.visible=fr%20<10;pol.m.b.visible=!pol.m.r.visible}
   if(running)todT+=1/4200;
@@ -3195,7 +3196,7 @@ function tick(){
   rainPts.visible=rn>.03;
   if(rainPts.visible){const a=rainPos;for(let i=0;i<RN;i++){a[i*3+1]-=.7;a[i*3+2]+=sp*ZS;if(a[i*3+1]<0||a[i*3+2]>12){a[i*3]=(Math.random()-.5)*36;a[i*3+1]=12+Math.random()*4;a[i*3+2]=-60+Math.random()*70}}rainGeo.attributes.position.needsUpdate=true;rainPts.material.opacity=.7*Math.min(1,rn*1.5)}
   if(gmode){gang+=.012;cam.position.set(Math.sin(gang)*11,3.2,Math.cos(gang)*11);cam.lookAt(0,6,0)}
-  else{cam.position.set(bx*.5+(shake>0?(Math.random()-.5)*.5:0),camD*1.45*.74+(shake>0?(Math.random()-.5)*.4:0),-6+camD*1.45*.67);cam.lookAt(bx*.5,0,-8);if(shake>0)shake--}
+  else{cam.position.set(bx*.5+(shake>0?(Math.random()-.5)*.5:0),(LS()?7:camD*1.45*.74)+(shake>0?(Math.random()-.5)*.4:0),LS()?16.3:-6+camD*1.45*.67);cam.lookAt(bx*.5,0,LS()?-6.6:-8);if(shake>0)shake--}
   rd.render(sc,cam);
   hx.clearRect(0,0,WW,HH);if(running)drawRace();
   if(pol.on&&running){hx.fillStyle=fr%20<10?'rgba(228,30,30,.3)':'rgba(40,90,255,.3)';hx.fillRect(0,0,12,HH);hx.fillRect(WW-12,0,12,HH)}
@@ -3213,10 +3214,10 @@ function tick(){
 }
 function fit(){
   const hud=document.getElementById('hud'),gb=document.getElementById('gb'),wr=document.getElementById('wrap');
-  const ls=innerWidth>innerHeight*1.05;document.body.classList.toggle('ls',ls);
+  const ls=innerWidth>innerHeight*1.05;document.body.classList.toggle('ls',ls);LANE=3.4*(ls?1.3:1);PX=.034*(ls?1.3:1);road.scale.x=ls?1.3:1;
   const h=ls?innerHeight:Math.max(200,innerHeight-hud.offsetHeight-gb.offsetHeight-34),w=ls?innerWidth:Math.min(innerWidth,h*.8),d=Math.min(window.devicePixelRatio||1,3);
   wr.style.width=w+'px';wr.style.height=h+'px';
-  rd.setSize(w,h,false);cam.aspect=w/h;cam.fov=ls?52:60;cam.updateProjectionMatrix();camD=ls?15:Math.min(36,Math.max(12,10.6/(1.154*(w/h)*.82)));
+  rd.setSize(w,h,false);cam.aspect=w/h;cam.fov=ls?42:60;cam.updateProjectionMatrix();camD=ls?15:Math.min(36,Math.max(12,10.6/(1.154*(w/h)*.82)));
   cv.width=w*d;cv.height=h*d;hx.setTransform(d,0,0,d,0,0);WW=w;HH=h;
 }
 addEventListener('resize',fit);fit();
