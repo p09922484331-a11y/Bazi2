@@ -48,12 +48,19 @@ body.ls #whb{left:calc(100px + env(safe-area-inset-left,0px))}
 body.ls #nib{right:calc(14px + env(safe-area-inset-right,0px))}
 body.ls #gu{right:calc(100px + env(safe-area-inset-right,0px))}
 body.ls #gd{right:calc(186px + env(safe-area-inset-right,0px))}
+#stl,#str{display:none;background:#e4572e;font-size:26px}
+body.ow #stl,body.ow #str{display:inline-block;min-width:58px;font-size:22px}
+body.ls #gb #stl,body.ls #gb #str{bottom:calc(76px + env(safe-area-inset-bottom,0px));height:64px;min-width:80px;font-size:30px;opacity:.88}
+body.ls #gb #stl{left:calc(14px + env(safe-area-inset-left,0px))}
+body.ls #gb #str{left:calc(104px + env(safe-area-inset-left,0px))}
+body.ls.nr #gb button{display:none}
+body.ls #msg.gar{inset:0 auto 0 0;width:52%;padding:44px 14px 10px;background:linear-gradient(to right,rgba(18,28,27,.96) 90%,rgba(18,28,27,0));border-radius:0;overflow:auto}
 </style>
 </head>
 <body>
 <div id="hud"><span>امتیاز: <b id="sc">0</b></span><span>رکورد: <b id="hi">0</b></span><span>🪙 <b id="co">0</b></span><span id="rh">↻ گوشی را بچرخان</span><button id="fs" aria-label="fullscreen">⛶</button><button id="ps" aria-label="pause">⏸</button><button id="mt" aria-label="sound">🔊</button><button id="mu" aria-label="music">🎵</button><button id="vb" aria-label="vibration">📳</button></div>
 <div id="wrap"><canvas id="g" width="300" height="480"></canvas><canvas id="c" width="300" height="480"></canvas><div id="msg"></div></div>
-<div id="gb"><button id="clb">کلاچ</button><button id="whb">تک‌چرخ</button><button id="gd">▼ دنده</button><button id="gu">▲ دنده</button><button id="nib">نیترو</button></div>
+<div id="gb"><button id="stl" aria-label="left">◀</button><button id="str" aria-label="right">▶</button><button id="clb">کلاچ</button><button id="whb">تک‌چرخ</button><button id="gd">▼ دنده</button><button id="gu">▲ دنده</button><button id="nib">نیترو</button></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>if(typeof THREE==="undefined"){document.getElementById("msg").innerHTML="<h1>اینترنت لازم است</h1><small>کتابخانه‌ی سه‌بعدی بارگذاری نشد. اتصال را چک کن و صفحه را دوباره باز کن.</small>"}</script>
 <script>
@@ -3188,12 +3195,12 @@ function owStream(){const cx=Math.floor(owPos.x/CH),cz=Math.floor(owPos.z/CH),ke
   for(const k in owCh)if(!need[k]){owG.remove(owCh[k].g);delete owCh[k]}
   for(const k in need)if(!owCh[k])owCh[k]=mkChunk(need[k][0],need[k][1]);
   owProps=[];for(const k in owCh)owProps.push(...owCh[k].list)}
-function startOW(){owBuild();initAudio();reset();OW=true;
+function startOW(){owBuild();initAudio();reset();OW=true;document.body.classList.add('ow');
   road.visible=false;gnd.forEach(g=>g.visible=false);trees.forEach(t=>t.visible=false);mtn.forEach(m=>m.visible=false);RV.forEach(r=>r.k.g.visible=false);owG.visible=true;
   owPos={x:0,z:40,psi:0,pc:0};owSt=0;owLean=0;kL=kR=false;owTouch={};rc=null;owCool=0;owCk='';Object.keys(owCh).forEach(k=>{owG.remove(owCh[k].g)});owCh={};owProps=[];owCp.visible=false;owMark.forEach(m=>m.g.visible=true);
   owCoins.forEach(c=>{c.t=0;c.m.visible=true});D={m:1,g:75};owB=0;owSky.copy(BI[0].s);score=0;scEl.textContent=0;
-  owStream();startEng();bann={t:'🌍 دنیای باز! به ستون‌های آبی برو تا مسابقه شروع شود',n:240}}
-function exitOW(){OW=false;running=false;paused=false;stopEng();cutOff();rc=null;owG.visible=false;road.visible=true;gnd.forEach(g=>g.visible=true);trees.forEach(t=>t.visible=true);mtn.forEach(m=>m.visible=true);RV.forEach(r=>r.k.g.visible=false);
+  owStream();startEng();bann={t:'🌍 با ◀ ▶ بپیچ و به ستون آبی برس',n:300}}
+function exitOW(){OW=false;document.body.classList.remove('ow');kL=kR=false;running=false;paused=false;stopEng();cutOff();rc=null;owG.visible=false;road.visible=true;gnd.forEach(g=>g.visible=true);trees.forEach(t=>t.visible=true);mtn.forEach(m=>m.visible=true);RV.forEach(r=>r.k.g.visible=false);
   bk.g.position.set(0,0,0);bk.g.rotation.y=0;sun.position.set(-5,10,6);sun.target.position.set(0,0,0);rainPts.position.set(0,0,0);rainPts.rotation.y=0;ps.textContent='⏸';save();ask('','')}
 function startRaceOW(i){const R=ROUTES[i],s=ND[R.s],wp=R.w.map(n=>ND[n]),a=Math.atan2(wp[0][0]-s[0],-(wp[0][1]-s[1])),fx=Math.sin(a),fz=-Math.cos(a),rx=Math.cos(a),rz=Math.sin(a);
   const cum=[];let t=0,px=s[0],pz=s[1];wp.forEach(w=>{t+=Math.hypot(w[0]-px,w[1]-pz);cum.push(t);px=w[0];pz=w[1]});
@@ -3248,9 +3255,11 @@ function owHud(){const ls=LS(),y0=ls?58:50,mS=ls?104:96,mx0=10,my0=84,f=v=>(v+42
     if(c){const a=Math.atan2(c[0]-owPos.x,-(c[1]-owPos.z))-owPos.psi;hx.translate(WW/2,y0+30);hx.rotate(a);hx.fillStyle='#f2c14e';hx.beginPath();hx.moveTo(0,-14);hx.lineTo(10,8);hx.lineTo(0,3);hx.lineTo(-10,8);hx.closePath();hx.fill();hx.rotate(-a);hx.fillStyle='#f4efe6';hx.font='12px Tahoma,sans-serif';hx.fillText(Math.round(Math.hypot(c[0]-owPos.x,c[1]-owPos.z))+' m',0,28)}hx.restore()}
   if(owOff&&speed>3){hx.save();hx.textAlign='center';hx.fillStyle='#f2c14e';hx.font='13px Tahoma,sans-serif';hx.fillText('خارج از جاده — کند می‌شوی',WW/2,HH-(ls?80:70));hx.restore()}}
 cv.addEventListener('pointerdown',e=>{if(!OW||!running)return;const r=cv.getBoundingClientRect();owTouch[e.pointerId]=e.clientX<r.left+r.width/2?-1:1});
+const stl=document.getElementById('stl'),str_=document.getElementById('str');
+[[stl,v=>kL=v],[str_,v=>kR=v]].forEach(([b,f])=>{b.onpointerdown=e=>{e.preventDefault();f(true);try{b.setPointerCapture(e.pointerId)}catch(_){}};b.onpointerup=b.onpointercancel=()=>f(false)});
 const owUp=e=>{delete owTouch[e.pointerId]};cv.addEventListener('pointerup',owUp);cv.addEventListener('pointercancel',owUp);
 function tick(){
-  requestAnimationFrame(tick);
+  requestAnimationFrame(tick);document.body.classList.toggle('nr',!running);
   const P=BP[bi];
   if(running&&OW){owStep()}else if(running){fr++;physics();spawn--;cspawn--;if(wh)ms('wh',1);if(gear===5&&speed>3)ms('g5',1);if(lim&&fr%8===0)vib(8);if(slipT>0)slipT--;
     x+=(lane*LW+LW/2-x)*.25;
@@ -3297,7 +3306,7 @@ function tick(){
   hemi.intensity=.9-.65*nn-.15*rn;sun.intensity=.8-.65*nn-.2*rn;bk.pl.intensity=nn*1.6;
   rainPts.visible=rn>.03;
   if(rainPts.visible){const a=rainPos;for(let i=0;i<RN;i++){a[i*3+1]-=.7;a[i*3+2]+=OW?0:sp*ZS;if(a[i*3+1]<0||a[i*3+2]>12){a[i*3]=(Math.random()-.5)*36;a[i*3+1]=12+Math.random()*4;a[i*3+2]=-60+Math.random()*70}}rainGeo.attributes.position.needsUpdate=true;rainPts.material.opacity=.7*Math.min(1,rn*1.5)}
-  if(gmode){gang+=.012;cam.position.set(Math.sin(gang)*11,3.2,Math.cos(gang)*11);cam.lookAt(0,6,0)}
+  if(gmode){gang+=.012;const ls=LS(),Rr=ls?15:18,cg=Math.cos(gang),sg=Math.sin(gang),sh=ls?6.5:0;cam.position.set(sg*Rr,ls?3.5:4,cg*Rr);cam.lookAt(-cg*sh,ls?2.8:7,sg*sh)}
   else if(OW){owCam()}
   else{cam.position.set(bx*.5+(shake>0?(Math.random()-.5)*.5:0),(LS()?7:camD*1.45*.74)+(shake>0?(Math.random()-.5)*.4:0),LS()?16.3:-6+camD*1.45*.67);cam.lookAt(bx*.5,0,LS()?-6.6:-8);if(shake>0)shake--}
   rd.render(sc,cam);
